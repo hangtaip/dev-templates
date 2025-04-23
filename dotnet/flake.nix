@@ -1,20 +1,25 @@
 {
   description = "A Nix-flake based Dotnet development environment";
 
-  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    flake-utils.url ="github:numtide/flake-utils";
+  };
 
-  outputs = { self, nixpkgs }:
-    let
-      supportedSystems = [ "x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin" ];
-      forEachSupportedSystem = f: nixpkgs.lib.genAttrs supportedSystems (system: f {
+  outputs = { self, nixpkgs, flake-utils }:
+    flake-utils.lib.eachDefaultSystem (system:
+      let
         pkgs = import nixpkgs { inherit system; };
-      });
-    in
-    {
-      devShells = forEachSupportedSystem ({ pkgs }: {
-        default = pkgs.mkShell {
-          packages = with pkgs; [ dotnet-sdk_10 ];
+      in
+      {
+          devShells.default =  pkgs.mkShell{
+            buildInputs = with pkgs; [
+              dotnet-sdk_10
+          ];
+
+          shellHook = ''
+            echo "dotnet development environment loaded!"
+          '';
         };
       });
-    };
 }
