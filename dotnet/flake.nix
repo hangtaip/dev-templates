@@ -15,6 +15,7 @@
           devShells.default =  pkgs.mkShell{
             buildInputs = with pkgs; [
               dotnet-sdk_10
+              nss_latest
           ];
 
           shellHook = ''
